@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pesan Online</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="keranjang.css">
 </head>
 <body>
     <header class="atas">
         <div class="wadah">
-            <!-- TODO: ganti dengan nama toko/warung -->
-            <a href="#" class="merek">Nama Toko</a>
+            <a href="#" class="merek">Warung WOWOK</a>
             <span>Keranjang: <strong id="jumlah-item">0</strong> item</span>
         </div>
     </header>
@@ -22,20 +22,88 @@
             <div id="daftar-menu" class="grid"></div>
         </section>
 
-        <aside class="kartu keranjang">
-            <h2>Keranjang</h2>
-            <!-- Isi keranjang diisi oleh script.js -->
+        <aside class="kartu keranjang" id="panel-keranjang">
+            <h2>
+                Keranjang
+                <button type="button" id="tombol-tutup-keranjang" class="sekunder tutup-keranjang">Tutup</button>
+            </h2>
+
+            <!-- Isi keranjang diisi oleh keranjang.js -->
             <ul id="isi-keranjang"></ul>
             <p id="keranjang-kosong" class="redup">Keranjang masih kosong.</p>
-            <p class="total">Total: <strong id="total">Rp0</strong></p>
+
+            <div class="promo">
+                <input type="text" id="kode-promo" placeholder="Kode promo" autocomplete="off">
+                <button type="button" id="tombol-promo" class="sekunder">Pakai</button>
+            </div>
+            <p id="info-promo" class="info-promo"></p>
+
+            <div class="ringkasan">
+                <p><span>Subtotal</span><span id="subtotal">Rp0</span></p>
+                <p id="baris-diskon" hidden><span>Diskon</span><span id="diskon">-Rp0</span></p>
+                <p class="total"><span>Total</span><strong id="total">Rp0</strong></p>
+            </div>
+
             <button id="tombol-pesan" disabled>Pesan</button>
+            <button type="button" id="tombol-kosongkan" class="sekunder" hidden>Kosongkan keranjang</button>
         </aside>
     </main>
 
     <footer class="bawah">
-        <div class="wadah">Mini Hackathon Teknologi Web · Nama Kelompok</div>
+        <div class="wadah">Mini Hackathon Teknologi Web · Kelompok WOWOK</div>
     </footer>
 
+    <!-- Bar keranjang yang menempel di bawah layar (hanya tampil di HP) -->
+    <div class="bar-keranjang" id="bar-keranjang">
+        <span><strong id="bar-jumlah">0</strong> item · <strong id="bar-total">Rp0</strong></span>
+        <button type="button" id="tombol-buka-keranjang">Lihat keranjang</button>
+    </div>
+
+    <!-- Form data pemesan -->
+    <dialog id="dialog-checkout">
+        <form id="form-checkout" novalidate>
+            <h3>Data Pemesan</h3>
+
+            <label for="nama">Nama</label>
+            <input type="text" id="nama" autocomplete="name">
+
+            <label for="hp">Nomor HP</label>
+            <input type="tel" id="hp" placeholder="081234567890" autocomplete="tel">
+
+            <fieldset>
+                <legend>Jenis pesanan</legend>
+                <label><input type="radio" name="tipe" value="makan" checked> Makan di tempat</label>
+                <label><input type="radio" name="tipe" value="ambil"> Ambil sendiri</label>
+                <label><input type="radio" name="tipe" value="antar"> Diantar</label>
+            </fieldset>
+
+            <div id="baris-detail">
+                <label for="detail" id="label-detail">Nomor meja</label>
+                <input type="text" id="detail">
+            </div>
+
+            <p id="error-checkout" class="info-promo salah" role="alert"></p>
+
+            <div class="aksi-dialog">
+                <button type="button" id="tombol-batal" class="sekunder">Batal</button>
+                <button type="submit">Buat Nota</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Nota pesanan -->
+    <dialog id="dialog-nota">
+        <div id="isi-nota"></div>
+        <div class="aksi-dialog tombol-nota">
+            <a id="tombol-wa" class="tombol-tautan" href="#" target="_blank" rel="noopener">Kirim ke WhatsApp</a>
+            <button type="button" id="tombol-cetak" class="sekunder">Cetak / Simpan PDF</button>
+            <button type="button" id="tombol-selesai">Selesai</button>
+        </div>
+    </dialog>
+
+    <!-- Urutan penting: data menu, lalu keranjang, lalu tampilan menu -->
+    <script src="menu.js"></script>
+    <script src="keranjang.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
