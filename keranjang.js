@@ -7,13 +7,17 @@
 //  3. Catatan per item (misal: "tanpa es")
 //  4. Kode promo dengan rincian subtotal, diskon, dan total
 //  5. Form data pemesan dengan validasi
-//  6. Nota pesanan (bisa dicetak / disimpan PDF) dan kirim ke WhatsApp
-//  7. Panel keranjang yang naik dari bawah di tampilan HP
+//  6. Metode pembayaran: tunai, QRIS (simulasi), ShopeePay, GoPay, DANA
+//  7. Nota pesanan (bisa dicetak / disimpan PDF) dan kirim ke WhatsApp
+//  8. Riwayat pesanan (tersimpan di browser pembeli)
+//  9. Panel keranjang yang naik dari bawah di tampilan HP
 //
 // Data menu ada di menu.js, tampilan kartu menu ada di script.js.
 // =====================================================
 
 const KUNCI_KERANJANG = 'wowok_keranjang';
+const KUNCI_RIWAYAT = 'wowok_riwayat';
+const MAKS_RIWAYAT = 10;
 
 // GANTI dengan nomor WhatsApp toko: awali 62, tanpa tanda + dan tanpa 0.
 // Contoh: '6281234567890'. Selama masih berisi X, tombol WhatsApp nonaktif.
@@ -30,6 +34,16 @@ const JENIS_PESANAN = {
     makan: { nama: 'Makan di tempat', label: 'Nomor meja', awalan: 'Meja ', wajib: true },
     ambil: { nama: 'Ambil sendiri', label: '', awalan: '', wajib: false },
     antar: { nama: 'Diantar', label: 'Alamat pengantaran', awalan: '', wajib: true },
+};
+
+// Metode pembayaran. Kunci harus sama dengan value radio name="bayar" di index.html.
+// nomor = tujuan transfer e-wallet (kosong untuk tunai dan QRIS).
+const PEMBAYARAN = {
+    tunai: { nama: 'Tunai (bayar di kasir)', nomor: '' },
+    qris: { nama: 'QRIS', nomor: '' },
+    shopeepay: { nama: 'ShopeePay', nomor: '083830991030' },
+    gopay: { nama: 'GoPay', nomor: '083830991030' },
+    dana: { nama: 'DANA', nomor: '08999218721' },
 };
 
 // Isi keranjang: { idMenu: { jumlah, catatan } }
@@ -285,6 +299,8 @@ function kirimForm(event) {
     const hp = document.getElementById('hp').value.replace(/[\s-]/g, '');
     const jenis = JENIS_PESANAN[document.querySelector('input[name="tipe"]:checked').value];
     const detail = document.getElementById('detail').value.trim();
+    const kodeBayar = document.querySelector('input[name="bayar"]:checked').value;
+    const bayar = PEMBAYARAN[kodeBayar];
 
     // Validasi
     const daftarError = [];
@@ -319,24 +335,29 @@ function kirimForm(event) {
     }
 
     pesananTerakhir = {
-    nomor: 'WOW-' + String(Date.now()).slice(-5),
-    waktu: new Date().toLocaleString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    }),
-    nama: nama,
-    hp: hp,
-    jenis: jenis.nama,
-    detail: jenis.wajib ? jenis.awalan + detail : '',
-    items: items,
-    subtotal: r.subtotal,
-    diskon: r.diskon,
-    kodePromo: r.diskon > 0 ? promoAktif : '',
-    total: r.total,
-};
+        nomor: 'WOW-' + String(Date.now()).slice(-5),
+        waktu: new Date().toLocaleString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        }),
+        nama: nama,
+        hp: hp,
+        jenis: jenis.nama,
+        detail: jenis.wajib ? jenis.awalan + detail : '',
+        bayarKode: kodeBayar,
+        bayar: bayar.nama,
+        bayarNomor: bayar.nomor,
+        items: items,
+        subtotal: r.subtotal,
+        diskon: r.diskon,
+        kodePromo: r.diskon > 0 ? promoAktif : '',
+        total: r.total,
+    };
+
+    simpanRiwayat(pesananTerakhir);
 
     tutupDialog(document.getElementById('dialog-checkout'));
     tampilkanNota(pesananTerakhir);
@@ -344,6 +365,46 @@ function kirimForm(event) {
 }
 
 // ---------- Nota dan WhatsApp ----------
+
+// Membuat QR di nota. QR berisi nomor pesanan dan total (simulasi, bukan QRIS sungguhan).
+function buatQR(p) {
+    const el = document.getElementById('qr-nota');
+    if (!el) {
+        return;
+    }
+    if (typeof QRCode === 'undefined') {
+        el.textContent = 'QR gagal dimuat. Periksa koneksi internet.';
+        return;
+    }
+    new QRCode(el, {
+        text: 'WOWOK|' + p.nomor + '|' + p.total,
+        width: 160,
+        height: 160,
+    });
+}
+
+function blokPembayaran(p) {
+    if (p.bayarKode === 'qris') {
+        return `
+        <div class="blok-bayar">
+            <p><strong>Scan untuk membayar ${rupiah(p.total)}</strong></p>
+            <div id="qr-nota" class="qr"></div>
+            <p class="redup"><small>QRIS simulasi untuk demo, bukan QRIS sungguhan.</small></p>
+        </div>`;
+    }
+    if (p.bayarNomor) {
+        return `
+        <div class="blok-bayar">
+            <p>Kirim <strong>${rupiah(p.total)}</strong> ke ${esc(p.bayar)}<br>
+            <span class="nomor-bayar">${esc(p.bayarNomor)}</span></p>
+            <p class="redup"><small>Tunjukkan bukti transfer ke penjual.</small></p>
+        </div>`;
+    }
+    return `
+        <div class="blok-bayar">
+            <p>Bayar tunai di kasir sebesar <strong>${rupiah(p.total)}</strong>.</p>
+        </div>`;
+}
 
 function tampilkanNota(p) {
     const baris = p.items.map((i) => `
@@ -356,14 +417,18 @@ function tampilkanNota(p) {
         <h3>Nota Pesanan ${esc(NAMA_TOKO)}</h3>
         <p class="redup">No. ${p.nomor} · ${p.waktu}</p>
         <p>Atas nama <strong>${esc(p.nama)}</strong> (${esc(p.hp)})<br>
-        ${esc(p.jenis)}${p.detail ? ' · ' + esc(p.detail) : ''}</p>
+        ${esc(p.jenis)}${p.detail ? ' · ' + esc(p.detail) : ''}<br>
+        Pembayaran: ${esc(p.bayar || '-')}</p>
         <table class="tabel-nota">
             ${baris}
             <tr><td>Subtotal</td><td class="kanan">${rupiah(p.subtotal)}</td></tr>
             ${p.diskon > 0 ? `<tr><td>Diskon (${esc(p.kodePromo)})</td><td class="kanan">-${rupiah(p.diskon)}</td></tr>` : ''}
             <tr class="total-nota"><td>Total</td><td class="kanan">${rupiah(p.total)}</td></tr>
         </table>
+        ${blokPembayaran(p)}
     `;
+
+    buatQR(p);
 
     // Tombol WhatsApp
     const tombolWA = document.getElementById('tombol-wa');
@@ -381,9 +446,11 @@ function tampilkanNota(p) {
 function buatPesanWA(p) {
     const baris = [];
     baris.push('*Pesanan ' + NAMA_TOKO + '* (' + p.nomor + ')');
+    baris.push('Waktu: ' + p.waktu);
     baris.push('Nama: ' + p.nama);
     baris.push('HP: ' + p.hp);
     baris.push('Jenis: ' + p.jenis + (p.detail ? ' (' + p.detail + ')' : ''));
+    baris.push('Pembayaran: ' + p.bayar + (p.bayarNomor ? ' (' + p.bayarNomor + ')' : ''));
     baris.push('');
     for (const i of p.items) {
         baris.push(i.jumlah + 'x ' + i.nama + ' - ' + rupiah(i.subtotal));
@@ -406,6 +473,50 @@ function selesaiPesanan() {
     aturDetail();
     kosongkan();
     tutupPanel();
+}
+
+// ---------- Riwayat pesanan ----------
+
+function muatRiwayat() {
+    try {
+        const data = JSON.parse(localStorage.getItem(KUNCI_RIWAYAT));
+        return Array.isArray(data) ? data : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function simpanRiwayat(pesanan) {
+    const daftar = muatRiwayat();
+    daftar.unshift(pesanan); // pesanan terbaru di paling atas
+    try {
+        localStorage.setItem(KUNCI_RIWAYAT, JSON.stringify(daftar.slice(0, MAKS_RIWAYAT)));
+    } catch (e) {
+        // Abaikan jika penyimpanan diblokir
+    }
+}
+
+function tampilkanRiwayat() {
+    const daftar = muatRiwayat();
+    const wadah = document.getElementById('isi-riwayat');
+
+    if (daftar.length === 0) {
+        wadah.innerHTML = '<p class="redup">Belum ada pesanan.</p>';
+        return;
+    }
+
+    wadah.innerHTML = daftar.map((p) => `
+        <details class="item-riwayat">
+            <summary>
+                <strong>${esc(p.nomor)}</strong> · ${rupiah(p.total)}<br>
+                <small>${esc(p.waktu)} · ${esc(p.jenis)}</small>
+            </summary>
+            <ul>
+                ${p.items.map((i) => `<li>${i.jumlah}x ${esc(i.nama)} (${rupiah(i.subtotal)})${i.catatan ? '<br><small>Catatan: ' + esc(i.catatan) + '</small>' : ''}</li>`).join('')}
+            </ul>
+            <p><small>${esc(p.nama)}${p.detail ? ' · ' + esc(p.detail) : ''}${p.bayar ? ' · ' + esc(p.bayar) : ''}</small></p>
+        </details>
+    `).join('');
 }
 
 // ---------- Menghubungkan tombol ----------
@@ -438,6 +549,25 @@ function pasangEvent() {
 
     document.getElementById('tombol-cetak').addEventListener('click', () => window.print());
     document.getElementById('tombol-selesai').addEventListener('click', selesaiPesanan);
+
+    // Riwayat
+    document.getElementById('tombol-riwayat').addEventListener('click', () => {
+        tampilkanRiwayat();
+        bukaDialog(document.getElementById('dialog-riwayat'));
+    });
+    document.getElementById('tutup-riwayat').addEventListener('click', () => {
+        tutupDialog(document.getElementById('dialog-riwayat'));
+    });
+    document.getElementById('hapus-riwayat').addEventListener('click', () => {
+        if (confirm('Hapus seluruh riwayat pesanan?')) {
+            try {
+                localStorage.removeItem(KUNCI_RIWAYAT);
+            } catch (e) {
+                // Abaikan
+            }
+            tampilkanRiwayat();
+        }
+    });
 }
 
 // ---------- Mulai ----------

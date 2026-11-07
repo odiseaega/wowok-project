@@ -52,13 +52,29 @@
 .tutup-keranjang { display: none; font-size: 14px; padding: 4px 10px; }
 .bar-keranjang { display: none; }
 
-/* ---------- Dialog (form pemesan dan nota) ---------- */
+/* ---------- Tombol riwayat di header ---------- */
+.kanan-header { display: inline-flex; align-items: center; gap: 12px; }
+.tombol-riwayat {
+    border: 2px solid rgba(255, 255, 255, .6);
+    background: rgba(255, 255, 255, .15);
+    color: inherit;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+.tombol-riwayat:hover { background: rgba(255, 255, 255, .28); }
+
+/* ---------- Dialog (form pemesan, nota, riwayat) ---------- */
 dialog {
     border: 1px solid var(--garis);
     border-radius: 10px;
     padding: 20px;
     width: calc(100% - 32px);
     max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
     color: var(--teks);
 }
 dialog::backdrop { background: rgba(0, 0, 0, .45); }
@@ -72,7 +88,7 @@ dialog input[type="text"], dialog input[type="tel"] {
     font: inherit;
 }
 dialog fieldset { border: 1px solid var(--garis); border-radius: 6px; margin: 12px 0 0; padding: 6px 12px 10px; }
-dialog fieldset label { margin: 6px 0 0; }
+dialog fieldset label { margin: 6px 0 0; cursor: pointer; }
 
 .aksi-dialog { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 16px; }
 .tombol-tautan {
@@ -89,6 +105,26 @@ dialog fieldset label { margin: 6px 0 0; }
 .tabel-nota td { padding: 4px 0; vertical-align: top; }
 .tabel-nota .kanan { text-align: right; white-space: nowrap; }
 .total-nota td { border-top: 1px solid var(--garis); font-weight: 700; padding-top: 8px; }
+
+/* ---------- Blok pembayaran di nota ---------- */
+.blok-bayar {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px dashed var(--garis);
+    border-radius: 8px;
+    text-align: center;
+}
+.blok-bayar p { margin: 4px 0; }
+.nomor-bayar { font-size: 20px; font-weight: 700; letter-spacing: .04em; }
+.qr { display: flex; justify-content: center; margin: 10px 0; min-height: 160px; }
+.qr img, .qr canvas { max-width: 100%; height: auto; }
+
+/* ---------- Riwayat ---------- */
+.item-riwayat { border-bottom: 1px solid var(--garis); padding: 8px 0; }
+.item-riwayat summary { cursor: pointer; }
+.item-riwayat ul { margin: 8px 0 4px; padding-left: 18px; }
+.item-riwayat li { display: list-item; padding: 2px 0; }
+.aksi-riwayat { justify-content: space-between; }
 
 /* ---------- Tampilan HP: keranjang naik dari bawah ---------- */
 @media (max-width: 700px) {
@@ -124,11 +160,14 @@ dialog fieldset label { margin: 6px 0 0; }
     }
     .keranjang.terbuka { transform: translateY(0); }
     .tutup-keranjang { display: inline-block; }
+
+    /* Di HP, teks "Keranjang: n item" disembunyikan karena sudah ada bar bawah */
+    .kanan-header > span { display: none; }
 }
 
 /* ---------- Cetak: hanya nota yang tercetak ---------- */
 @media print {
     body > *:not(#dialog-nota) { display: none !important; }
-    #dialog-nota { position: static; border: 0; max-width: none; width: 100%; }
+    #dialog-nota { position: static; border: 0; max-width: none; width: 100%; max-height: none; overflow: visible; }
     .tombol-nota { display: none !important; }
 }

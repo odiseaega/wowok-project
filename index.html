@@ -11,7 +11,10 @@
     <header class="atas">
         <div class="wadah">
             <a href="#" class="merek">Warung WOWOK</a>
-            <span>Keranjang: <strong id="jumlah-item">0</strong> item</span>
+            <span class="kanan-header">
+                <button type="button" id="tombol-riwayat" class="tombol-riwayat">🧾 Riwayat</button>
+                <span>Keranjang: <strong id="jumlah-item">0</strong> item</span>
+            </span>
         </div>
     </header>
 
@@ -82,6 +85,15 @@
                 <input type="text" id="detail">
             </div>
 
+            <fieldset>
+                <legend>Metode pembayaran</legend>
+                <label><input type="radio" name="bayar" value="tunai" checked> Tunai (bayar di kasir)</label>
+                <label><input type="radio" name="bayar" value="qris"> QRIS</label>
+                <label><input type="radio" name="bayar" value="shopeepay"> ShopeePay</label>
+                <label><input type="radio" name="bayar" value="gopay"> GoPay</label>
+                <label><input type="radio" name="bayar" value="dana"> DANA</label>
+            </fieldset>
+
             <p id="error-checkout" class="info-promo salah" role="alert"></p>
 
             <div class="aksi-dialog">
@@ -100,6 +112,19 @@
             <button type="button" id="tombol-selesai">Selesai</button>
         </div>
     </dialog>
+
+    <!-- Riwayat pesanan -->
+    <dialog id="dialog-riwayat">
+        <h3>Riwayat Pesanan</h3>
+        <div id="isi-riwayat"></div>
+        <div class="aksi-dialog aksi-riwayat">
+            <button type="button" id="hapus-riwayat" class="sekunder">Hapus riwayat</button>
+            <button type="button" id="tutup-riwayat">Tutup</button>
+        </div>
+    </dialog>
+
+    <!-- Library pembuat QR (butuh internet) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <!-- Urutan penting: data menu, lalu keranjang, lalu tampilan menu -->
     <script src="menu.js"></script>
