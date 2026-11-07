@@ -17,7 +17,7 @@ const KUNCI_KERANJANG = 'wowok_keranjang';
 
 // GANTI dengan nomor WhatsApp toko: awali 62, tanpa tanda + dan tanpa 0.
 // Contoh: '6281234567890'. Selama masih berisi X, tombol WhatsApp nonaktif.
-const NOMOR_WA = '628999218721';
+const NOMOR_WA = '62882007659336';
 
 // Daftar kode promo yang berlaku
 const KODE_PROMO = {
@@ -27,9 +27,9 @@ const KODE_PROMO = {
 
 // Jenis pesanan: wajib = apakah perlu isian tambahan (meja / alamat)
 const JENIS_PESANAN = {
-    makan: { nama: 'Makan di tempat', label: 'Nomor meja', wajib: true },
-    ambil: { nama: 'Ambil sendiri', label: '', wajib: false },
-    antar: { nama: 'Diantar', label: 'Alamat pengantaran', wajib: true },
+    makan: { nama: 'Makan di tempat', label: 'Nomor meja', awalan: 'Meja ', wajib: true },
+    ambil: { nama: 'Ambil sendiri', label: '', awalan: '', wajib: false },
+    antar: { nama: 'Diantar', label: 'Alamat pengantaran', awalan: '', wajib: true },
 };
 
 // Isi keranjang: { idMenu: { jumlah, catatan } }
@@ -319,18 +319,24 @@ function kirimForm(event) {
     }
 
     pesananTerakhir = {
-        nomor: 'WOW-' + String(Date.now()).slice(-5),
-        waktu: new Date().toLocaleString('id-ID'),
-        nama: nama,
-        hp: hp,
-        jenis: jenis.nama,
-        detail: jenis.wajib ? detail : '',
-        items: items,
-        subtotal: r.subtotal,
-        diskon: r.diskon,
-        kodePromo: r.diskon > 0 ? promoAktif : '',
-        total: r.total,
-    };
+    nomor: 'WOW-' + String(Date.now()).slice(-5),
+    waktu: new Date().toLocaleString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }),
+    nama: nama,
+    hp: hp,
+    jenis: jenis.nama,
+    detail: jenis.wajib ? jenis.awalan + detail : '',
+    items: items,
+    subtotal: r.subtotal,
+    diskon: r.diskon,
+    kodePromo: r.diskon > 0 ? promoAktif : '',
+    total: r.total,
+};
 
     tutupDialog(document.getElementById('dialog-checkout'));
     tampilkanNota(pesananTerakhir);
