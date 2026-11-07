@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pesan Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="atas">
+        <div class="wadah">
+            <!-- TODO: ganti dengan nama toko/warung -->
+            <a href="#" class="merek">Nama Toko</a>
+            <span>Keranjang: <strong id="jumlah-item">0</strong> item</span>
+        </div>
+    </header>
+
+    <main class="wadah tata">
+        <section>
+            <h2>Menu</h2>
+            <!-- Kartu menu diisi oleh script.js -->
+            <div id="daftar-menu" class="grid"></div>
+        </section>
+
+        <aside class="kartu keranjang">
+            <h2>Keranjang</h2>
+            <!-- Isi keranjang diisi oleh script.js -->
+            <ul id="isi-keranjang"></ul>
+            <p id="keranjang-kosong" class="redup">Keranjang masih kosong.</p>
+            <p class="total">Total: <strong id="total">Rp0</strong></p>
+            <button id="tombol-pesan" disabled>Pesan</button>
+        </aside>
+    </main>
+
+    <footer class="bawah">
+        <div class="wadah">Mini Hackathon Teknologi Web · Nama Kelompok</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

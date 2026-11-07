@@ -1,0 +1,68 @@
+/* Ganti warna di sini, semua bagian halaman ikut berubah */
+:root {
+    --utama: #059669;
+    --teks: #1f2937;
+    --redup: #6b7280;
+    --latar: #f9fafb;
+    --kartu: #ffffff;
+    --garis: #e5e7eb;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    color: var(--teks);
+    background: var(--latar);
+    line-height: 1.5;
+}
+
+.wadah { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
+.redup { color: var(--redup); }
+
+/* Header */
+.atas { background: var(--utama); color: #fff; }
+.atas .wadah { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; padding-bottom: 14px; }
+.merek { color: #fff; font-weight: 700; font-size: 20px; text-decoration: none; }
+
+/* Tata letak: menu di kiri, keranjang di kanan */
+main.wadah { padding-top: 24px; padding-bottom: 48px; }
+.tata { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+h2 { margin-top: 0; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+
+.kartu { background: var(--kartu); border: 1px solid var(--garis); border-radius: 8px; padding: 16px; }
+.kartu h3 { margin: 0 0 4px; font-size: 17px; }
+.harga { color: var(--utama); font-weight: 700; margin: 0 0 12px; }
+
+/* Keranjang */
+.keranjang { position: sticky; top: 16px; }
+.keranjang ul { list-style: none; padding: 0; margin: 0 0 12px; }
+.keranjang li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--garis); }
+.keranjang small { color: var(--redup); }
+.jumlah { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.jumlah button { padding: 2px 10px; }
+.total { font-size: 18px; }
+#tombol-pesan { width: 100%; }
+
+button {
+    background: var(--utama);
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font: inherit;
+    cursor: pointer;
+}
+button:hover { opacity: .9; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Footer */
+.bawah { border-top: 1px solid var(--garis); padding: 16px 0; color: var(--redup); font-size: 14px; }
+
+@media (max-width: 700px) {
+    .tata { grid-template-columns: 1fr; }
+    .keranjang { position: static; }
+}
