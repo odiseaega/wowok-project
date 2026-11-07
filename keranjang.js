@@ -17,7 +17,7 @@ const KUNCI_KERANJANG = 'wowok_keranjang';
 
 // GANTI dengan nomor WhatsApp toko: awali 62, tanpa tanda + dan tanpa 0.
 // Contoh: '6281234567890'. Selama masih berisi X, tombol WhatsApp nonaktif.
-const NOMOR_WA = '62XXXXXXXXXX';
+const NOMOR_WA = '628999218721';
 
 // Daftar kode promo yang berlaku
 const KODE_PROMO = {
