@@ -1,23 +1,8 @@
-// =====================================================
-// keranjang.js: fitur keranjang pemesanan (bagian Ega)
-//
-// Fitur:
-//  1. Keranjang tersimpan otomatis (localStorage), tidak hilang saat refresh
-//  2. Ubah jumlah (+/-), hapus item, dan kosongkan keranjang
-//  3. Catatan per item (misal: "tanpa es")
-//  4. Kode promo dengan rincian subtotal, diskon, dan total
-//  5. Form data pemesan dengan validasi
-//  6. Nota pesanan (bisa dicetak / disimpan PDF) dan kirim ke WhatsApp
-//  7. Panel keranjang yang naik dari bawah di tampilan HP
-//
-// Data menu ada di menu.js, tampilan kartu menu ada di script.js.
-// =====================================================
-
 const KUNCI_KERANJANG = 'wowok_keranjang';
 
 // GANTI dengan nomor WhatsApp toko: awali 62, tanpa tanda + dan tanpa 0.
 // Contoh: '6281234567890'. Selama masih berisi X, tombol WhatsApp nonaktif.
-const NOMOR_WA = '628999218721';
+const NOMOR_WA = '62XXXXXXXXXX';
 
 // Daftar kode promo yang berlaku
 const KODE_PROMO = {
@@ -363,7 +348,7 @@ function tampilkanNota(p) {
     const tombolWA = document.getElementById('tombol-wa');
     if (NOMOR_WA.indexOf('X') !== -1) {
         tombolWA.removeAttribute('href');
-        tombolWA.textContent = 'Atur NOMOR_WA di keranjang.js';
+        tombolWA.textContent = 'hubungi toko via WhatsApp';
         tombolWA.classList.add('nonaktif');
     } else {
         tombolWA.href = 'https://wa.me/' + NOMOR_WA + '?text=' + encodeURIComponent(buatPesanWA(p));
